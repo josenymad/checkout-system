@@ -24,6 +24,37 @@ type FileBasedPricingService struct {
 	pricingRules map[string]PricingRule
 }
 
+func NewFileBasedPricingService(filePath string) (*FileBasedPricingService, error) {
+	service := &FileBasedPricingService{}
+	err := service.loadPricingRules(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return service, nil
+}
+
+func (s *FileBasedPricingService) loadPricingRules(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("could not open pricing file: %v", err)
+	}
+	defer file.Close()
+
+	byteValue, err := io.ReadAll(file)
+	if err != nil {
+		return fmt.Errorf("could not read pricing file: %v", err)
+	}
+
+	var pricingRules map[string]PricingRule
+	err = json.Unmarshal(byteValue, &pricingRules)
+	if err != nil {
+		return fmt.Errorf("could not parse pricing file: %v", err)
+	}
+
+	s.pricingRules = pricingRules
+	return nil
+}
+
 func (s *FileBasedPricingService) GetPricingRule(SKU string) (PricingRule, error) {
 	rule, exists := s.pricingRules[SKU]
 	if !exists {
