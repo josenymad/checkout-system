@@ -24,6 +24,10 @@ func NewCheckout(pricingRules map[string]PricingRule) *Checkout {
 }
 
 func (c *Checkout) Scan(SKU string) error {
+	_, exists := c.pricingRules[SKU]
+	if !exists {
+		return errors.New("invalid SKU")
+	}
 	c.items[SKU]++
 	return nil
 }
