@@ -6,6 +6,10 @@ func TestCheckoutImplementation(t *testing.T) {
 	var _ ICheckout = (*Checkout)(nil)
 }
 
+func TestPricingServiceImplementation(t *testing.T) {
+	var _ PricingService = (*FileBasedPricingService)(nil)
+}
+
 func TestCheckout(t *testing.T) {
 	mockRules := map[string]PricingRule{
 		"A": {UnitPrice: 50, DiscountQty: 3, DiscountPrice: 130},
