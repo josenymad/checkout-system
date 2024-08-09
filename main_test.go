@@ -122,3 +122,21 @@ func TestCheckout(t *testing.T) {
 		t.Fatalf("expected error for unrecognized SKU, got nil")
 	}
 }
+
+func TestEmptyCheckout(t *testing.T) {
+	mockRules := map[string]PricingRule{
+		"A": {UnitPrice: 50, DiscountQty: 3, DiscountPrice: 130},
+		"B": {UnitPrice: 30, DiscountQty: 2, DiscountPrice: 45},
+	}
+	mockService := NewMockPricingService(mockRules)
+	checkout := NewCheckout(mockService)
+
+	// test empty checkout
+	totalPrice, err := checkout.GetTotalPrice()
+	if err == nil {
+		t.Fatalf("expected error for empty checkout, got nil")
+	}
+	if totalPrice != 0 {
+		t.Fatalf("expected total price 0, got %d", totalPrice)
+	}
+}
