@@ -89,4 +89,12 @@ func TestCheckout(t *testing.T) {
 	if totalPrice != 65 {
 		t.Fatalf("expected total price 65, got %d", totalPrice)
 	}
+
+	// test error handling for unrecognized SKU
+	checkout = NewCheckout(mockRules)
+
+	err = checkout.Scan("X")
+	if err == nil {
+		t.Fatalf("expected error for unrecognized SKU, got nil")
+	}
 }
