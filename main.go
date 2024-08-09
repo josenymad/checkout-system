@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -87,10 +88,17 @@ func (c *Checkout) Scan(SKU string) error {
 }
 
 func (c *Checkout) GetTotalPrice() (totalPrice int, err error) {
+	if len(c.items) == 0 {
+		return 0, errors.New("no items have been scanned")
+	}
+
 	for SKU, count := range c.items {
 		rule, err := c.pricingService.GetPricingRule(SKU)
 		if err != nil {
 			return 0, err
+		}
+		if rule.UnitPrice <= 0 || (rule.DiscountQty > 0 && rule.DiscountPrice <= 0) {
+			return 0, fmt.Errorf("invalid pricing rule for SKU: %s", SKU)
 		}
 		if rule.DiscountQty > 0 && count >= rule.DiscountQty {
 			totalPrice += (count / rule.DiscountQty) * rule.DiscountPrice
