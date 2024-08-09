@@ -8,5 +8,5 @@
 
 ## Usage
 
-1. Run the main application: `go run checkout.go`.
+1. Run the main application: `go run main.go`.
 2. Follow the prompts to scan items and get the total price.
