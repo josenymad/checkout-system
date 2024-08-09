@@ -14,6 +14,7 @@ func TestCheckout(t *testing.T) {
 
 	checkout := NewCheckout(mockRules)
 
+	// test without discount
 	err := checkout.Scan("A")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -31,5 +32,28 @@ func TestCheckout(t *testing.T) {
 
 	if totalPrice != 80 {
 		t.Fatalf("expected total price 80, got %d", totalPrice)
+	}
+
+	// test with discount
+	checkout = NewCheckout(mockRules)
+
+	err = checkout.Scan("A")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	err = checkout.Scan("A")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	err = checkout.Scan("A")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	totalPrice, err = checkout.GetTotalPrice()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if totalPrice != 130 {
+		t.Fatalf("expected total price 130, got %d", totalPrice)
 	}
 }
