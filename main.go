@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -67,21 +66,21 @@ func (s *FileBasedPricingService) GetPricingRule(SKU string) (PricingRule, error
 }
 
 type Checkout struct {
-	items        map[string]int
-	pricingRules map[string]PricingRule
+	items          map[string]int
+	pricingService PricingService
 }
 
-func NewCheckout(pricingRules map[string]PricingRule) *Checkout {
+func NewCheckout(pricingService PricingService) *Checkout {
 	return &Checkout{
-		items:        make(map[string]int),
-		pricingRules: pricingRules,
+		items:          make(map[string]int),
+		pricingService: pricingService,
 	}
 }
 
 func (c *Checkout) Scan(SKU string) error {
-	_, exists := c.pricingRules[SKU]
-	if !exists {
-		return errors.New("invalid SKU")
+	_, err := c.pricingService.GetPricingRule(SKU)
+	if err != nil {
+		return err
 	}
 	c.items[SKU]++
 	return nil
@@ -89,9 +88,9 @@ func (c *Checkout) Scan(SKU string) error {
 
 func (c *Checkout) GetTotalPrice() (totalPrice int, err error) {
 	for SKU, count := range c.items {
-		rule, exists := c.pricingRules[SKU]
-		if !exists {
-			return 0, fmt.Errorf("no pricing rule found for SKU: %s", SKU)
+		rule, err := c.pricingService.GetPricingRule(SKU)
+		if err != nil {
+			return 0, err
 		}
 		if rule.DiscountQty > 0 && count >= rule.DiscountQty {
 			totalPrice += (count / rule.DiscountQty) * rule.DiscountPrice
