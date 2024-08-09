@@ -5,6 +5,12 @@ type ICheckout interface {
 	GetTotalPrice() (totalPrice int, err error)
 }
 
+type PricingRule struct {
+	UnitPrice     int
+	DiscountQty   int
+	DiscountPrice int
+}
+
 type Checkout struct {
 	items map[string]int
 }
