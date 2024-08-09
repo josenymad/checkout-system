@@ -12,7 +12,8 @@ type PricingRule struct {
 }
 
 type Checkout struct {
-	items map[string]int
+	items        map[string]int
+	pricingRules map[string]PricingRule
 }
 
 func NewCheckout() *Checkout {
