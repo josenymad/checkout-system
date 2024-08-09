@@ -33,8 +33,17 @@ func (c *Checkout) Scan(SKU string) error {
 }
 
 func (c *Checkout) GetTotalPrice() (totalPrice int, err error) {
-	for _, count := range c.items {
-		totalPrice += count * 50
+	for SKU, count := range c.items {
+		rule, exists := c.pricingRules[SKU]
+		if !exists {
+			return 0, fmt.Errorf("no pricing rule found for SKU: %s", SKU)
+		}
+		if rule.DiscountQty > 0 && count >= rule.DiscountQty {
+			totalPrice += (count / rule.DiscountQty) * rule.DiscountPrice
+			totalPrice += (count % rule.DiscountQty) * rule.UnitPrice
+		} else {
+			totalPrice += count * rule.UnitPrice
+		}
 	}
 	return totalPrice, nil
 }
