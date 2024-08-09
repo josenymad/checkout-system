@@ -109,3 +109,43 @@ func (c *Checkout) GetTotalPrice() (totalPrice int, err error) {
 	}
 	return totalPrice, nil
 }
+
+func main() {
+	pricingService, err := NewFileBasedPricingService("pricing_rules.json")
+	if err != nil {
+		fmt.Println("Error loading pricing service:", err)
+		return
+	}
+
+	checkout := NewCheckout(pricingService)
+
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println("Welcome to the checkout system!")
+	fmt.Println("Type SKU letters to scan items. Type 'checkout' to finish and see the total price.")
+
+	for {
+		fmt.Print("Enter SKU: ")
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		input = strings.ToUpper(input)
+
+		if input == "CHECKOUT" {
+			break
+		}
+
+		err = checkout.Scan(input)
+		if err != nil {
+			fmt.Println("Error scanning item:", err)
+		} else {
+			fmt.Printf("Scanned %s\n", input)
+		}
+	}
+
+	totalPrice, err := checkout.GetTotalPrice()
+	if err != nil {
+		fmt.Println("Error calculating total price:", err)
+	} else {
+		fmt.Printf("Total Price: %d\n", totalPrice)
+	}
+}
