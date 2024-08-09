@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestCheckoutImplementation(t *testing.T) {
 	var _ ICheckout = (*Checkout)(nil)
@@ -8,6 +11,22 @@ func TestCheckoutImplementation(t *testing.T) {
 
 func TestPricingServiceImplementation(t *testing.T) {
 	var _ PricingService = (*FileBasedPricingService)(nil)
+}
+
+type MockPricingService struct {
+	pricingRules map[string]PricingRule
+}
+
+func NewMockPricingService(rules map[string]PricingRule) *MockPricingService {
+	return &MockPricingService{pricingRules: rules}
+}
+
+func (m *MockPricingService) GetPricingRule(SKU string) (PricingRule, error) {
+	rule, exists := m.pricingRules[SKU]
+	if !exists {
+		return PricingRule{}, fmt.Errorf("no pricing rule found for SKU: %s", SKU)
+	}
+	return rule, nil
 }
 
 func TestCheckout(t *testing.T) {
@@ -18,7 +37,8 @@ func TestCheckout(t *testing.T) {
 		"D": {UnitPrice: 15},
 	}
 
-	checkout := NewCheckout(mockRules)
+	mockService := NewMockPricingService(mockRules)
+	checkout := NewCheckout(mockService)
 
 	// test without discount
 	err := checkout.Scan("A")
@@ -41,7 +61,7 @@ func TestCheckout(t *testing.T) {
 	}
 
 	// test with discount
-	checkout = NewCheckout(mockRules)
+	checkout = NewCheckout(mockService)
 
 	err = checkout.Scan("A")
 	if err != nil {
@@ -68,7 +88,7 @@ func TestCheckout(t *testing.T) {
 	}
 
 	// test with discount and regular pricing
-	checkout = NewCheckout(mockRules)
+	checkout = NewCheckout(mockService)
 
 	err = checkout.Scan("B")
 	if err != nil {
@@ -95,7 +115,7 @@ func TestCheckout(t *testing.T) {
 	}
 
 	// test error handling for unrecognized SKU
-	checkout = NewCheckout(mockRules)
+	checkout = NewCheckout(mockService)
 
 	err = checkout.Scan("X")
 	if err == nil {
