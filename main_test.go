@@ -19,12 +19,17 @@ func TestCheckout(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	err = checkout.Scan("B")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
 	totalPrice, err := checkout.GetTotalPrice()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if totalPrice != 50 {
-		t.Fatalf("expected total price 50, got %d", totalPrice)
+	if totalPrice != 80 {
+		t.Fatalf("expected total price 80, got %d", totalPrice)
 	}
 }
