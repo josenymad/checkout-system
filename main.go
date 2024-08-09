@@ -16,9 +16,10 @@ type Checkout struct {
 	pricingRules map[string]PricingRule
 }
 
-func NewCheckout() *Checkout {
+func NewCheckout(pricingRules map[string]PricingRule) *Checkout {
 	return &Checkout{
-		items: make(map[string]int),
+		items:        make(map[string]int),
+		pricingRules: pricingRules,
 	}
 }
 
