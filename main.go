@@ -1,5 +1,10 @@
 package main
 
+import (
+	"errors"
+	"fmt"
+)
+
 type ICheckout interface {
 	Scan(SKU string) error
 	GetTotalPrice() (totalPrice int, err error)
