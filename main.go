@@ -16,6 +16,22 @@ type PricingRule struct {
 	DiscountPrice int
 }
 
+type PricingService interface {
+	GetPricingRule(SKU string) (PricingRule, error)
+}
+
+type FileBasedPricingService struct {
+	pricingRules map[string]PricingRule
+}
+
+func (s *FileBasedPricingService) GetPricingRule(SKU string) (PricingRule, error) {
+	rule, exists := s.pricingRules[SKU]
+	if !exists {
+		return PricingRule{}, fmt.Errorf("no pricing rule found for SKU: %s", SKU)
+	}
+	return rule, nil
+}
+
 type Checkout struct {
 	items        map[string]int
 	pricingRules map[string]PricingRule
