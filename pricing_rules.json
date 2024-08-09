@@ -1,13 +1,13 @@
 {
     "A": {
         "UnitPrice": 50,
-        "SpecialQty": 3,
-        "SpecialPrice": 130
+        "DiscountQty": 3,
+        "DiscountPrice": 130
     },
     "B": {
         "UnitPrice": 30,
-        "SpecialQty": 2,
-        "SpecialPrice": 45
+        "DiscountQty": 2,
+        "DiscountPrice": 45
     },
     "C": {
         "UnitPrice": 20
